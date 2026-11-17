@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mystery Color Studio</title>
+<style>
+:root{--navy:#172033;--ink:#20283a;--muted:#6b7280;--paper:#f7f8fc;--purple:#7157e8;--line:#e7e9f1}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;color:var(--ink);background:var(--paper)}
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.nav{max-width:1180px;margin:auto;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{font-weight:900;letter-spacing:.4px;color:var(--navy);font-size:19px}.brand span{color:var(--purple)}
+nav{display:flex;gap:18px;align-items:center;flex-wrap:wrap}nav a{font-size:13px;text-decoration:none;color:#4b5563;font-weight:650}
+button,.btn{border:0;border-radius:11px;padding:11px 16px;background:var(--purple);color:white;font-weight:750;cursor:pointer;text-decoration:none;display:inline-block}
+button.secondary,.btn.secondary{background:#eeeaff;color:#5941c7}button.dark{background:var(--navy)}button:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:1180px;margin:auto;padding:28px 22px 70px}
+.hero{background:linear-gradient(120deg,#171f35,#3a326e);color:white;border-radius:24px;padding:42px;display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;overflow:hidden}
+.hero h1{font-size:clamp(34px,5vw,55px);line-height:1.03;margin:10px 0 15px}.hero p{color:#d8d8ed;line-height:1.7}.eyebrow{color:#bdb1ff;font-weight:800;font-size:12px;letter-spacing:2px}
+.hero-art{background:#fff;border-radius:18px;padding:12px;transform:rotate(2deg)}.hero-art img{width:100%;display:block;border-radius:12px}
+.section{margin-top:38px}.section h2{font-size:26px;margin:0 0 8px}.sub{color:var(--muted);margin:0 0 20px}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 30px #26304a0a}
+.generator{display:grid;grid-template-columns:340px 1fr;gap:20px}.controls{display:flex;flex-direction:column;gap:13px}
+label{font-size:13px;font-weight:750;color:#394154}input,select{width:100%;padding:11px;border:1px solid #dfe2eb;border-radius:10px;background:white;margin-top:6px;color:var(--ink)}
+.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
+.preview{min-height:420px;background:#f1f2f8;border:1px dashed #cdd1df;border-radius:15px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px}
+canvas{max-width:100%;max-height:620px;object-fit:contain;background:white;border-radius:8px}
+.hint{font-size:12px;color:var(--muted);line-height:1.5}.palette{display:flex;gap:6px;flex-wrap:wrap}.swatch{width:22px;height:22px;border-radius:6px;border:1px solid #bbb}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.card img{width:100%;height:170px;object-fit:cover}.card .body{padding:15px}.card h3{margin:0 0 7px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.feature{padding:18px;background:white;border:1px solid var(--line);border-radius:15px}.feature b{display:block;margin:8px 0}.feature span{font-size:13px;color:var(--muted)}
+footer{background:var(--navy);color:#d5d8e5;padding:30px 22px;text-align:center;font-size:13px}
+.modal{position:fixed;inset:0;background:#10172999;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.modalbox{background:white;border-radius:18px;padding:24px;width:min(420px,100%)}
+#status{font-size:13px;color:#5b46c8;min-height:18px}
+@media(max-width:800px){.hero,.generator{grid-template-columns:1fr}.hero{padding:28px}.cards{grid-template-columns:1fr 1fr}.feature-grid{grid-template-columns:1fr 1fr}nav{gap:10px}.nav{align-items:flex-start;flex-direction:column}}
+@media(max-width:520px){.cards{grid-template-columns:1fr}.row{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+<header><div class="nav"><div class="brand">MYSTERY <span>COLOR</span> STUDIO</div><nav>
+<a href="#home">Home</a><a href="#generator">Generator</a><a href="#gallery">Gallery</a><a href="#tutorials">Tutorials</a><a href="#blog">Blog</a>
+<button class="secondary" onclick="openAuth()">Login / Register</button>
+</nav></div></header>
+<main>
+<section class="hero" id="home"><div><div class="eyebrow">CREATE • COLOR • DISCOVER</div><h1>Turn Your Photos Into Mystery Art!</h1><p>Create your own geometric color-by-number puzzles. Upload a picture, choose a shape, and make printable mosaic artwork.</p><a class="btn" href="#generator">Start Creating Free</a></div>
+<div class="hero-art"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?w=900&q=85" alt="Colorful abstract artwork"></div></section>
+<section class="section" id="generator"><h2>Mystery Mosaic Generator</h2><p class="sub">Upload a JPG or PNG image and turn it into a numbered mosaic puzzle.</p>
+<div class="generator"><div class="panel controls">
+<label>1. Upload your photo<input type="file" id="upload" accept="image/png,image/jpeg,image/webp"></label>
+<div class="row"><label>Grid size<select id="grid"><option value="18">Small · 18</option><option value="28" selected>Medium · 28</option><option value="40">Detailed · 40</option><option value="55">Extra detail · 55</option></select></label>
+<label>Color count<select id="colors"><option>6</option><option selected>10</option><option>14</option><option>18</option></select></label></div>
+<label>2. Choose a shape<select id="shape">
+<option>Square</option><option>Triangle</option><option>Diamond</option><option>Hexagon</option><option>Circle</option><option>Vertical Rectangle</option><option>Horizontal Rectangle</option><option>Rhombus</option><option>Octagon</option><option>Star</option><option>Heart</option><option>Cross</option><option>Trapezoid</option><option>Pentagon</option><option>Chevron</option><option>Tile</option>
+</select></label>
+<button id="make" class="dark" disabled onclick="makeMosaic()">Generate Mystery Mosaic</button>
+<div class="row"><button class="secondary" id="png" disabled onclick="downloadPNG()">Download PNG</button><button class="secondary" id="pdf" disabled onclick="downloadPDF()">Print / Save PDF</button></div>
+<div id="status">Upload an image to get started.</div><div class="hint">Tip: Use a clear photo with a simple subject for the best result. Your image is processed in this browser in this starter version.</div>
+<div><b style="font-size:13px">Color key</b><div id="palette" class="palette"></div></div>
+</div>
+<div class="preview"><canvas id="art" width="900" height="650"></canvas></div></div>
+</section>
+<section class="section"><h2>Made for creative minds</h2><p class="sub">Everything you need to start making printable mosaic puzzles.</p><div class="feature-grid">
+<div class="feature">🧩<b>16+ Shapes</b><span>Experiment with geometric tile styles.</span></div><div class="feature">🎨<b>Color Numbering</b><span>Build a numbered color key for each puzzle.</span></div><div class="feature">📥<b>Easy Export</b><span>Save your design as PNG or print to PDF.</span></div><div class="feature">🖼️<b>Printable Gallery</b><span>Explore ideas and sample artwork.</span></div></div></section>
+<section class="section" id="gallery"><h2>Free Printable Gallery</h2><p class="sub">Sample inspiration cards. Add your own original printable files here later.</p><div class="cards">
+<article class="card"><img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=700&q=80" alt="Abstract art"><div class="body"><h3>Colorful Abstract</h3><p>A bright inspiration for your next mosaic.</p></div></article>
+<article class="card"><img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=700&q=80" alt="Ocean"><div class="body"><h3>Ocean Dream</h3><p>Try cool tones and flowing shapes.</p></div></article>
+<article class="card"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=700&q=80" alt="Landscape"><div class="body"><h3>Nature Escape</h3><p>Turn a landscape into a puzzle.</p></div></article></div></section>
+<section class="section" id="tutorials"><h2>Tutorials</h2><p class="sub">Learn how to create and print your own color-by-number art.</p><div class="cards">
+<article class="card"><div class="body"><h3>01 · Choose a good photo</h3><p>Use a sharp image with a clear subject and good contrast. Avoid very dark or blurry photos.</p></div></article>
+<article class="card"><div class="body"><h3>02 · Pick your puzzle style</h3><p>Start with Square or Hexagon. Increase grid size for more detail and choose a smaller color palette for simplicity.</p></div></article>
+<article class="card"><div class="body"><h3>03 · Print your puzzle</h3><p>Download the PNG or use Print / Save PDF, then choose “Save as PDF” in your browser.</p></div></article></div></section>
+<section class="section" id="blog"><h2>From the Blog</h2><p class="sub">Ideas and tips for your creative projects.</p><div class="cards">
+<article class="card"><div class="body"><h3>What is a Mystery Mosaic?</h3><p>A puzzle where numbered geometric cells reveal an image as you color them.</p></div></article>
+<article class="card"><div class="body"><h3>How many colors should I use?</h3><p>Six to ten colors is a friendly starting point. More colors can preserve extra detail.</p></div></article>
+<article class="card"><div class="body"><h3>Make print-ready puzzle pages</h3><p>Choose a clear layout and test print at normal size before sharing your design.</p></div></article></div></section>
+</main>
+<footer>© 2026 Mystery Color Studio · Made for creativity</footer>
+<div class="modal" id="auth"><div class="modalbox"><h2 id="authTitle">Welcome back</h2><p class="hint">Starter demo only: accounts are stored in this browser, not securely online.</p><label>Email<input id="email" type="email" placeholder="you@example.com"></label><label>Password<input id="password" type="password" placeholder="At least 6 characters"></label><p id="authMsg" class="hint"></p><div class="row"><button onclick="login()">Login</button><button class="secondary" onclick="register()">Register</button></div><p><button class="secondary" onclick="logout()">Logout</button> <button class="secondary" onclick="closeAuth()">Close</button></p></div></div>
+<script>
+const canvas=document.getElementById('art'),ctx=canvas.getContext('2d');let sourceImage=null,generated=false;
+const paletteBase=['#f4f0df','#e8b84e','#d96b45','#9d4c62','#654b8e','#4f78a8','#55a89a','#8eae66','#333b55','#d8d9df','#f18caa','#8a6d50','#b6a2d8','#6b8e9e','#d3a36c','#7d9b76','#b34e3e','#52604c'];
+document.getElementById('upload').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);sourceImage=new Image();sourceImage.onload=()=>{document.getElementById('make').disabled=false;document.getElementById('status').textContent='Photo ready. Choose settings and generate.';ctx.clearRect(0,0,canvas.width,canvas.height);const scale=Math.min(850/sourceImage.width,600/sourceImage.height);const w=sourceImage.width*scale,h=sourceImage.height*scale;ctx.drawImage(sourceImage,(canvas.width-w)/2,(canvas.height-h)/2,w,h);};sourceImage.src=url;});
+function polygonPoints(x,y,w,h,shape){let cx=x+w/2,cy=y+h/2;switch(shape){
+case'Triangle':return [[cx,y],[x+w,y+h],[x,y+h]];
+case'Diamond':case'Rhombus':return [[cx,y],[x+w,y+h/2],[cx,y+h],[x,y+h/2]];
+case'Hexagon':return [[x+w*.25,y],[x+w*.75,y],[x+w,y+h/2],[x+w*.75,y+h],[x+w*.25,y+h],[x,y+h/2]];
+case'Octagon':return [[x+w*.3,y],[x+w*.7,y],[x+w,y+h*.3],[x+w,y+h*.7],[x+w*.7,y+h],[x+w*.3,y+h],[x,y+h*.7],[x,y+h*.3]];
+case'Pentagon':return [[cx,y],[x+w,y+h*.38],[x+w*.8,y+h],[x+w*.2,y+h],[x,y+h*.38]];
+case'Trapezoid':return [[x+w*.2,y],[x+w*.8,y],[x+w,y+h],[x,y+h]];
+case'Vertical Rectangle':return [[cx-w*.25,y],[cx+w*.25,y],[cx+w*.25,y+h],[cx-w*.25,y+h]];
+case'Horizontal Rectangle':return [[x,cy-h*.25],[x+w,cy-h*.25],[x+w,cy+h*.25],[x,cy+h*.25]];
+case'Cross':return [[x+w*.35,y],[x+w*.65,y],[x+w*.65,y+h*.35],[x+w,y+h*.35],[x+w,y+h*.65],[x+w*.65,y+h*.65],[x+w*.65,y+h],[x+w*.35,y+h],[x+w*.35,y+h*.65],[x,y+h*.65],[x,y+h*.35],[x+w*.35,y+h*.35]];
+case'Chevron':return [[x,y],[x+w*.55,y],[x+w,y+h/2],[x+w*.55,y+h],[x,y+h],[x+w*.45,y+h/2]];
+case'Star':return Array.from({length:10},(_,i)=>{let a=-Math.PI/2+i*Math.PI/5,r=i%2?w*.22:w*.48;return [cx+Math.cos(a)*r,cy+Math.sin(a)*r]});
+case'Heart':return Array.from({length:24},(_,i)=>{let t=i*Math.PI*2/24;return [cx+w*.42*Math.pow(Math.sin(t),3),cy-h*.38*(.8125*Math.cos(t)-.3125*Math.cos(2*t)-.125*Math.cos(3*t)-.0625*Math.cos(4*t))]});
+case'Circle':ctx.ellipse(cx,cy,w*.46,h*.46,0,0,Math.PI*2);return null;
+default:return [[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
+}}
+function makeMosaic(){if(!sourceImage)return;let n=+document.getElementById('grid').value,cols=n,rows=Math.max(1,Math.round(n*sourceImage.height/sourceImage.width)),W=900,H=650,margin=18;canvas.width=W;canvas.height=H;let cellW=(W-2*margin)/cols,cellH=(H-2*margin)/rows;
+let tmp=document.createElement('canvas');tmp.width=cols;tmp.height=rows;let t=tmp.getContext('2d');t.drawImage(sourceImage,0,0,cols,rows);let data=t.getImageData(0,0,cols,rows).data;let count=+document.getElementById('colors').value,shape=document.getElementById('shape').value;let bins=Array.from({length:count},(_,i)=>paletteBase[Math.floor(i*paletteBase.length/count)]);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+for(let yy=0;yy<rows;yy++)for(let xx=0;xx<cols;xx++){let k=(yy*cols+xx)*4,r=data[k],g=data[k+1],b=data[k+2];let lum=(r*.299+g*.587+b*.114)/255;let idx=Math.min(count-1,Math.floor((1-lum)*count));let x=margin+xx*cellW,y=margin+yy*cellH;ctx.beginPath();let pts=polygonPoints(x,y,cellW,cellH,shape);if(pts){ctx.moveTo(...pts[0]);pts.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath()}ctx.fillStyle=bins[idx];ctx.fill();ctx.strokeStyle='#ffffff';ctx.lineWidth=.8;ctx.stroke();ctx.fillStyle='#20283a';ctx.font=`${Math.max(7,Math.min(12,cellW*.35))}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(idx+1),x+cellW/2,y+cellH/2);}
+document.getElementById('palette').innerHTML=bins.map((c,i)=>`<span title="Color ${i+1}" class="swatch" style="background:${c}"></span>`).join('');document.getElementById('status').textContent=`Your ${shape.toLowerCase()} mosaic is ready!`;document.getElementById('png').disabled=false;document.getElementById('pdf').disabled=false;generated=true;}
+function downloadPNG(){if(!generated)return;let a=document.createElement('a');a.download='mystery-color-studio.png';a.href=canvas.toDataURL('image/png');a.click();}
+function downloadPDF(){if(!generated)return;let w=window.open('','_blank');if(!w){alert('Please allow pop-ups to print/save PDF.');return;}w.document.write(`<html><head><title>Mystery Color Studio Puzzle</title><style>body{margin:0;text-align:center}img{max-width:100%;max-height:95vh} @page{size:A4 landscape;margin:10mm}</style></head><body><img src="${canvas.toDataURL('image/png')}"><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close();}
+function openAuth(){document.getElementById('auth').classList.add('show');document.getElementById('authMsg').textContent=localStorage.getItem('mcs_current')?'Signed in as '+localStorage.getItem('mcs_current'):'';}
+function closeAuth(){document.getElementById('auth').classList.remove('show')}
+function register(){let e=document.getElementById('email').value.trim().toLowerCase(),p=document.getElementById('password').value;if(!e||p.length<6){document.getElementById('authMsg').textContent='Enter a valid email and password with 6+ characters.';return}let users=JSON.parse(localStorage.getItem('mcs_users')||'{}');if(users[e]){document.getElementById('authMsg').textContent='Account already exists in this browser.';return}users[e]=p;localStorage.setItem('mcs_users',JSON.stringify(users));localStorage.setItem('mcs_current',e);document.getElementById('authMsg').textContent='Demo account created. This is not secure production authentication.';}
+function login(){let e=document.getElementById('email').value.trim().toLowerCase(),p=document.getElementById('password').value,users=JSON.parse(localStorage.getItem('mcs_users')||'{}');if(users[e]===p){localStorage.setItem('mcs_current',e);document.getElementById('authMsg').textContent='Logged in as '+e;}else document.getElementById('authMsg').textContent='Login not found. Register first on this browser.';}
+function logout(){localStorage.removeItem('mcs_current');document.getElementById('authMsg').textContent='Logged out.';}
+</script>
+</body></html>
